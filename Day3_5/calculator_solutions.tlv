@@ -41,3 +41,16 @@
          $err2 = $err1 | $over_flow;
       @6
          $err3 = $err2 | $div_by_zero;
+         
+   |calc
+      @1                                 
+         $val2[31:0] = $rand2[3:0];
+   
+         $sum[31:0]  = >>1$out + $val2;
+         $diff[31:0] = >>1$out - $val2;
+         $prod[31:0] = >>1$out * $val2;
+         $quot[31:0] = >>1$out / $val2;
+   
+         $out[31:0] = $reset ? 32'd0 : $op[1:0]==0 ? $sum : $op[1:0]==1 ? $diff : $op[1:0]==2 ? $prod : $quot;
+
+         $cnt[31:0] = !$reset ? 0 : >>1$cnt + 1; 
