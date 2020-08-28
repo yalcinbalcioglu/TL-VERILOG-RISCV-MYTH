@@ -111,3 +111,17 @@
          @2
             $out[31:0] = $reset ? 32'd0 : $op==4 ? $store : $op[2:0]==0 ? $sum : $op[2:0]==1 ? $diff : $op[2:0]==2 ? $prod : $quot;
             $mem[31:0] = $reset ? '0 : $op==5 ? $store : $val1;
+
+
+
+
+   |calc
+      
+      // DUT
+      /coord[1:0]
+         @1
+            $sq[9:0] = $value[3:0] ** 2;
+      @2
+         $cc_sq[10:0] = /coord[0]$sq + /coord[1]$sq;
+      @3
+         $cc[4:0] = sqrt($cc_sq);
