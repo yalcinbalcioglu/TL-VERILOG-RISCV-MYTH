@@ -89,3 +89,25 @@
             $cnt = !$reset ? 0 : >>1$cnt + 1; 
          @2
             $out[31:0] = $reset ? 32'd0 : $op[1:0]==0 ? $sum : $op[1:0]==1 ? $diff : $op[1:0]==2 ? $prod : $quot;
+            
+            
+            
+            
+   |calc
+      @1
+         $valid = >>1$cnt;
+      
+      ?$valid
+         @1                                 
+            $val2[31:0] = $rand2[3:0];
+            $val1[31:0] = >>2$out;
+            $store[31:0] = >>2$mem; 
+   
+            $sum[31:0]  = >>2$out + $val2;
+            $diff[31:0] = >>2$out - $val2;
+            $prod[31:0] = >>2$out * $val2;
+            $quot[31:0] = >>2$out / $val2;
+            $cnt = !$reset ? 0 : >>1$cnt + 1; 
+         @2
+            $out[31:0] = $reset ? 32'd0 : $op==4 ? $store : $op[2:0]==0 ? $sum : $op[2:0]==1 ? $diff : $op[2:0]==2 ? $prod : $quot;
+            $mem[31:0] = $reset ? '0 : $op==5 ? $store : $val1;
