@@ -32,3 +32,12 @@
    
          $out[31:0] = $reset ? 32'd0 : $op[1:0]==0 ? $sum : $op[1:0]==1 ? $diff : $op[1:0]==2 ? $prod : $quot;
    
+\TLV
+   |comp
+      
+      @1
+         $err1 = $bad_input | $illegal_op;
+      @3
+         $err2 = $err1 | $over_flow;
+      @6
+         $err3 = $err2 | $div_by_zero;
