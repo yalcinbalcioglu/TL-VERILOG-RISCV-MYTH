@@ -60,3 +60,32 @@
          $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
          ?$funct3_valid
             $funct3[2:0] = $instr[14:12];
+         
+         
+         $dec_bits[10:0] = {$funct7[5],$funct3,$opcode};   
+         $is_beq = $dec_bits ==? 
+                   11'bx_000_1100011;
+         $is_bne = $dec_bits ==? 
+                   11'bx_001_1100011;
+         $is_blt = $dec_bits ==? 
+                   11'bx_100_1100011;
+         $is_bge = $dec_bits ==? 
+                   11'bx_101_1100011;
+         $is_bltu = $dec_bits ==? 
+                   11'bx_110_1100011;
+         $is_bgeu = $dec_bits ==? 
+                   11'bx_111_1100011;
+         $is_add = $dec_bits ==? 
+                   11'bx_000_0110011;
+         $is_addi = $dec_bits ==? 
+                   11'bx_000_0010011;
+         
+         `BOGUS_USE($is_beq $is_bne $is_blt $is_bge $is_bltu $is_bgeu $is_add $is_addi)
+      
+         $rf_wr_en = $rd_valid;
+         $rf_rd_en1 = $rs1_valid;
+         $rf_rd_en2 = $rs2_valid;
+         $rf_wr_index = $rd;
+         //$rf_wr_data = 
+         $rf_rd_index1 = $rs1;
+         $rf_rd_index2 = $rs2;
