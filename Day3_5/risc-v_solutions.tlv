@@ -40,10 +40,10 @@
    |cpu
       @0
          $reset = *reset;
-         $pc[31:0] = >>1$reset ? '0 : >>1$is_b_instr ? $br_tgt_pc : >>1$pc+1;
+         $pc[31:0] = >>1$reset ? '0 : >>1$taken_br ? >>1$br_tgt_pc : >>1$pc+1;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
          $imem_rd_en = !$reset;
-
+         
 
       // YOUR CODE HERE
       @1
@@ -144,7 +144,7 @@
                      
          $br_tgt_pc = $pc + $imm;            
       
-      @2 
+      
 
          
 
@@ -154,7 +154,9 @@
 
    
    // Assert these to end simulation (before Makerchip cycle limit).
-   *passed = *cyc_cnt > 40;
+   *passed = |cpu/xreg[10]>>5$value == (1+2+3+4+5+6+7+8+9);
+   //*passed = *cyc_cnt > 40;
+
    *failed = 1'b0;
    
    // Macro instantiations for:
