@@ -40,7 +40,7 @@
    |cpu
       @0
          $reset = *reset;
-         $pc[31:0] = >>1$reset ? '0 : >>1$pc+1;
+         $pc[31:0] = >>1$reset ? '0 : >>1$is_b_instr ? $br_tgt_pc : >>1$pc+1;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
          $imem_rd_en = !$reset;
 
@@ -117,7 +117,7 @@
          
          `BOGUS_USE($is_beq $is_bne $is_blt $is_bge $is_bltu $is_bgeu $is_add $is_addi)
       
-         $rf_wr_en = $rd==0 ? 0 : $is_add | $is_addi;
+         $rf_wr_en = $rd==0 ? 0 : $rd_valid;
          $rf_rd_en1 = $rs1_valid;
          $rf_rd_en2 = $rs2_valid;
          $rf_wr_index = $rd;
@@ -132,11 +132,19 @@
             $is_addi ? $src1_value + $imm : 
             $is_add  ? $src1_value + $src2_value :
                        32'bx;
-                       
-                       
+         
+         $taken_br = 
+                     $is_beq ? $rf_rd_data1==$rf_rd_data2 :
+                     $is_bne ? $rf_rd_data1!=$rf_rd_data2 :
+                     $is_blt ? ($rf_rd_data1 <  $rf_rd_data2) ^ ($rf_rd_data1[31] != $rf_rd_data2[31]) :
+                     $is_bge ? ($rf_rd_data1 >= $rf_rd_data2) ^ ($rf_rd_data1[31] != $rf_rd_data2[31]) :
+                     $is_bltu ? $rf_rd_data1 <  $rf_rd_data2 :
+                     $is_bgeu ? $rf_rd_data1 >= $rf_rd_data2 :
+                     1'b0;  
+                     
+         $br_tgt_pc = $pc + $imm;            
       
       @2 
-      
 
          
 
@@ -163,4 +171,3 @@
                        // @4 would work for all labs
 \SV
    endmodule
-      
