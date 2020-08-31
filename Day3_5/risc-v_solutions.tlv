@@ -40,7 +40,7 @@
    |cpu
       @0
          $reset = *reset;
-         $pc[31:0] = >>1$reset ? '0 : (>>3$taken_br) ? >>3$br_tgt_pc : >>1$pc+1;
+         $pc[31:0] = >>1$reset ? '0 : (>>3$taken_br) ? >>3$br_tgt_pc : >>1$pc+4;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
          $imem_rd_en = !$reset;
          $start = !$reset & >>1$reset;
@@ -113,7 +113,7 @@
          $is_bgeu = $dec_bits ==? 
                    11'bx_111_1100011;
          $is_add = $dec_bits ==? 
-                   11'bx_000_0110011;
+                   11'b0_000_0110011;
          $is_addi = $dec_bits ==? 
                    11'bx_000_0010011;
          
@@ -126,12 +126,12 @@
          
 
       @2            
-         $br_tgt_pc = $pc + $imm;      
+         $br_tgt_pc[31:0] = $pc + $imm;      
          
          $rf_rd_en1 = $rs1_valid | >>2$rf_wr_en;
          $rf_rd_en2 = $rs2_valid | >>2$rf_wr_en;
-         $rf_rd_index1 = $rs1;
-         $rf_rd_index2 = $rs2;
+         $rf_rd_index1[4:0] = $rs1;
+         $rf_rd_index2[4:0] = $rs2;
          $src1_value[31:0] = >>1$rd==$rs1 & >>1$rf_wr_en ? >>1$result : $rf_rd_data1;
          $src2_value[31:0] = $rf_rd_data2;
          $rf_wr_data[31:0] = >>2$result; 
@@ -139,7 +139,7 @@
       @3
             
          $rf_wr_en = $rd==0  ? 0 : $rd_valid && $valid && ($is_beq | $is_bne | $is_blt | $is_bge | $is_bltu | $is_bgeu | $is_add | $is_addi);
-         $rf_wr_index = $rd;
+         $rf_wr_index[4:0] = $rd;
            
          $valid = $reset ? 1'b0 : $start | (>>1$taken_br || >>2$taken_br);
          
@@ -151,8 +151,8 @@
          $taken_br = 
                      $is_beq ? $src1_value==$src2_value :
                      $is_bne ? $src1_value!=$src2_value :
-                     $is_blt ? ($src1_value <  $src2_value) ^ ($src2_value[31] != $src2_value[31]) :
-                     $is_bge ? ($src1_value >= $src2_value) ^ ($src2_value[31] != $src2_value[31]) :
+                     $is_blt ? ($src1_value <  $src2_value) ^ ($src1_value[31] != $src2_value[31]) :
+                     $is_bge ? ($src1_value >= $src2_value) ^ ($src1_value[31] != $src2_value[31]) :
                      $is_bltu ? $src1_value <  $src2_value :
                      $is_bgeu ? $src1_value >= $src2_value :
                      1'b0;        
@@ -184,9 +184,6 @@
                        // @4 would work for all labs
 \SV
    endmodule
-
-
-
 
 
 
@@ -325,8 +322,8 @@
          $rf_rd_index1[4:0] = $rs1;
          $rf_rd_index2[4:0] = $rs2;
          
-         $src1_value[31:0] = >>1$rf_rd_data1;
-         $src2_value[31:0] = >>1$rf_rd_data2;
+         $src1_value[31:0] = $rf_rd_data1;
+         $src2_value[31:0] = $rf_rd_data2;
          
          $rf_wr_en = $rd==0 ? 0 : $rd_valid;
          $rf_wr_index[4:0] = $rd;
