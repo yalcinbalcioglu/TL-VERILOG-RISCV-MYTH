@@ -203,13 +203,6 @@
 
 
 
-
-
-
-
-
-
-
 \m4_TLV_version 1d: tl-x.org
 \SV
    // This code can be found in: https://github.com/stevehoover/RISC-V_MYTH_Workshop
@@ -252,7 +245,7 @@
    |cpu
       @0
          $reset = *reset;
-         $pc[31:0] = >>1$reset ? '0 : >>1$taken_br ? >>1$br_tgt_pc : >>1$pc+1;
+         $pc[31:0] = >>1$reset ? '0 : >>1$taken_br ? >>1$br_tgt_pc : >>1$pc+4;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
          $imem_rd_en = !$reset;
          
@@ -323,22 +316,27 @@
          $is_bgeu = $dec_bits ==? 
                    11'bx_111_1100011;
          $is_add = $dec_bits ==? 
-                   11'bx_000_0110011;
+                   11'b0_000_0110011;
          $is_addi = $dec_bits ==? 
                    11'bx_000_0010011;
          
          `BOGUS_USE($is_beq $is_bne $is_blt $is_bge $is_bltu $is_bgeu $is_add $is_addi)
       
-         $rf_wr_en = $rd==0 ? 0 : $rd_valid;
+         
          $rf_rd_en1 = $rs1_valid;
          $rf_rd_en2 = $rs2_valid;
-         $rf_wr_index = $rd;
+         $rf_rd_index1[4:0] = $rs1;
+         $rf_rd_index2[4:0] = $rs2;
+         
+         $src1_value[31:0] = >>1$rf_rd_data1;
+         $src2_value[31:0] = >>1$rf_rd_data2;
+         
+         $rf_wr_en = $rd==0 ? 0 : $rd_valid;
+         $rf_wr_index[4:0] = $rd;
          $rf_wr_data[31:0] = $result;
-         $rf_rd_index1 = $rs1;
-         $rf_rd_index2 = $rs2;
+         
       
-         $src1_value[31:0] = $rf_rd_data1;
-         $src2_value[31:0] = $rf_rd_data2;
+
          
          $result[31:0]  = 
             $is_addi ? $src1_value + $imm : 
@@ -346,12 +344,12 @@
                        32'bx;
          
          $taken_br = 
-                     $is_beq ? $rf_rd_data1==$rf_rd_data2 :
-                     $is_bne ? $rf_rd_data1!=$rf_rd_data2 :
-                     $is_blt ? ($rf_rd_data1 <  $rf_rd_data2) ^ ($rf_rd_data1[31] != $rf_rd_data2[31]) :
-                     $is_bge ? ($rf_rd_data1 >= $rf_rd_data2) ^ ($rf_rd_data1[31] != $rf_rd_data2[31]) :
-                     $is_bltu ? $rf_rd_data1 <  $rf_rd_data2 :
-                     $is_bgeu ? $rf_rd_data1 >= $rf_rd_data2 :
+                     $is_beq ? $src1_value == $src2_value :
+                     $is_bne ? $src1_value != $src2_value :
+                     $is_blt ? ($src1_value <  $src2_value) ^ ($src1_value[31] != $src2_value[31]) :
+                     $is_bge ? ($src1_value >= $src2_value) ^ ($src1_value[31] != $src2_value[31]) :
+                     $is_bltu ? $src1_value <  $src2_value :
+                     $is_bgeu ? $src1_value >= $src2_value :
                      1'b0;  
                      
          $br_tgt_pc = $pc + $imm;            
