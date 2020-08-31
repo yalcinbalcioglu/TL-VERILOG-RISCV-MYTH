@@ -200,9 +200,6 @@
 
 
 
-
-
-
 \m4_TLV_version 1d: tl-x.org
 \SV
    // This code can be found in: https://github.com/stevehoover/RISC-V_MYTH_Workshop
@@ -352,7 +349,7 @@
                      $is_bgeu ? $src1_value >= $src2_value :
                      1'b0;  
                      
-         $br_tgt_pc = $pc + $imm;            
+         $br_tgt_pc[31:0] = $pc + $imm;            
       
       
 
