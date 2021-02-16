@@ -189,7 +189,7 @@
                          $is_lui ? ({$imm[31:12], 12'b0}) :
                          $is_auipc ? $pc + $imm :
                          $is_jal ? $pc + $imm :
-                         $is_jalr ? $pc + $imm : 
+                         $is_jalr ? $src1_value + $imm : 
                          ($is_load || $is_s_instr) ? $src1_value + $imm : 32'bx;
                          
       // Register File Write
